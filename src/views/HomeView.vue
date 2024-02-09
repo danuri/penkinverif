@@ -9,8 +9,8 @@
 
           <div class="page-title-right">
             <ol class="breadcrumb m-0">
-              <li class="breadcrumb-item"><a href="javascript: void(0);">Pages</a></li>
-              <li class="breadcrumb-item active">Starter Page</li>
+              <li class="breadcrumb-item"><a href="javascript:;">Penkin</a></li>
+              <li class="breadcrumb-item active">Verifikasi</li>
             </ol>
           </div>
 
@@ -74,7 +74,7 @@
                   </li>
                   <div v-for="post in posts" :key="post.id">
                   <li class="list-group-item">
-                    <div class="d-flex align-items-center pagi-list">
+                    <div class="d-flex align-items-center">
                       <div class="flex-shrink-0 me-3">
                         <div>
                           <img class="image avatar-xs rounded-circle" alt="" src="https://d2mj1s7x3czrue.cloudfront.net/hrms/assets/images/users/avatar-1.jpg">
@@ -82,7 +82,7 @@
                       </div>
 
                       <div class="flex-grow-1 overflow-hidden">
-                        <h5 class="fs-13 mb-1"><a href="" class="link text-body">{{ post.title }}</a></h5>
+                        <h5 class="fs-13 mb-1"><a href="" class="link text-body pagi-list">{{ post.title }}</a></h5>
                         <p class="born timestamp text-muted mb-0">Petugas Transportasi</p>
                         <p class="born timestamp mb-0">{{ post.body }}</p>
                       </div>
@@ -147,7 +147,21 @@
     </div>
   </div>
   <div class="offcanvas-foorter border p-3 text-center">
-    <a href="javascript:void(0);" class="btn btn-success">Terima <i class="ri-checkbox-fill align-middle ms-1"></i></a> <a href="javascript:void(0);" class="btn btn-danger" @click="decline(id)">Kembalikan <i class="ri-close-circle-fill align-middle ms-1"></i></a>
+    <input type="hidden" name="id" id="taskid">
+    <a href="javascript:void(0);" class="btn btn-success" @click="accept(id)">Terima <i class="ri-checkbox-fill align-middle ms-1"></i></a> <a href="javascript:void(0);" class="btn btn-danger" @click="decline(id)">Kembalikan <i class="ri-close-circle-fill align-middle ms-1"></i></a>
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="errorCanvas" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-body p-0 overflow-hidden">
+    <div data-simplebar style="height: calc(100vh - 112px);">
+      <div class="text-center">
+          <img src="https://img.themesbrand.com/velzon/images/auth-offline.gif" alt="" height="210">
+          <h3 class="mt-4 fw-semibold">Tidak dapat mengakses server!</h3>
+          <p class="text-muted mb-4 fs-14">Kami tidak dapat menampilkan data dikarenakan koneksi Anda terganggu. Periksa kembali koneksi Anda. Saat sudah kembali, silahkan klik refresh.</p>
+          <button class="btn btn-success btn-border" onclick="window.location.href=window.location.href"><i class="ri-refresh-line align-bottom"></i> Refresh</button>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -166,9 +180,12 @@ export default {
               event.stopPropagation()
               var bsOffcanvas = new bootstrap.Offcanvas(document.getElementById('detailCanvas'))
               bsOffcanvas.show()
-              console.log(id)
+              document.getElementById('taskid').ariaValueNow = id
             },
-            decline: function decline(id) {
+            decline: function decline() {
+              let taskid = document.getElementById("taskid").ariaValueNow
+              console.log(taskid);
+              
               Swal.fire({
                 text: 'Masukan informasi penolakan!',
                 input: 'text',
@@ -182,7 +199,7 @@ export default {
                 preConfirm: (data) => {
                   return fetch('', {
                     method: "POST",
-                    body: JSON.stringify({ keterangan: data }),
+                    body: JSON.stringify({ keterangan: data,id: taskid }),
                     headers: {"Content-type": "application/json; charset=UTF-8"}})
                     .then(response => {
                       if (!response.ok) {
@@ -202,6 +219,9 @@ export default {
                     //remove task
                   }
                 });
+              },
+              accept: function accept(){
+                confirm('Laporan diterima?');
               }
           },
           mounted() {
@@ -211,12 +231,26 @@ export default {
               document.getElementById('taskplaceholder').style.display = 'none'
               this.posts = response.data
             })
+            .catch(function (error) {
+              if (error.response) {
+                console.log('a',error.response.data);
+                console.log('b',rror.response.status);
+                console.log('c',error.response.headers);
+              } else if (error.request) {
+                //error here
+                var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'))
+                bsErrorcanvas.show()
+              } else {
+                console.log('Error', error.message);
+              }
+              console.log('e',error.config);
+            })
             .finally(function () {
-              //new List("pagination-list",{
-              //  valueNames: ["pagi-list"],
-              //  page: 10,
-              //  pagination: !0
-              //})
+              new List("pagination-list",{
+                valueNames: ["pagi-list"],
+                page: 10,
+                pagination: !0
+              })
             })
 
           }
