@@ -243,7 +243,6 @@ export default {
               } else {
                 console.log('Error', error.message);
               }
-              console.log('e',error.config);
             })
             .finally(function () {
               new List("pagination-list",{
