@@ -82,7 +82,7 @@
                       </div>
 
                       <div class="flex-grow-1 overflow-hidden">
-                        <h5 class="fs-13 mb-1"><a href="" class="link text-body pagi-list">{{ post.title }}</a></h5>
+                        <h5 class="fs-13 mb-1"><a href="" class="link text-body pagi-list">{{ post.ketua_nama }}</a></h5>
                         <p class="born timestamp text-muted mb-0">Petugas Transportasi</p>
                         <p class="born timestamp mb-0">{{ post.body }}</p>
                       </div>
@@ -226,7 +226,7 @@ export default {
           },
           mounted() {
           axios
-            .get('https://jsonplaceholder.typicode.com/posts/')
+            .get('https://ropeg.kemenag.go.id/trans/api/kloter')
             .then((response) => {
               document.getElementById('taskplaceholder').style.display = 'none'
               this.posts = response.data
