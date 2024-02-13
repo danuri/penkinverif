@@ -1,23 +1,100 @@
-<template><div class="page-content">
+<script>
+
+import PageHeader from '@/layouts/pageHeader.vue';
+import axios from 'axios'
+bootstrap.Offcanvas.prototype._initializeFocusTrap = () => ({ activate: () => { }, deactivate: () => { } });
+export default {
+    data() {
+        return {
+            posts: []
+        };
+    },
+    methods: {
+        detail: function detail(id) {
+            event.stopPropagation();
+            var bsOffcanvas = new bootstrap.Offcanvas(document.getElementById('detailCanvas'));
+            bsOffcanvas.show();
+            document.getElementById('taskid').ariaValueNow = id;
+        },
+        decline: function decline() {
+            let taskid = document.getElementById("taskid").ariaValueNow;
+            console.log(taskid);
+            Swal.fire({
+                text: 'Masukan informasi penolakan!',
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Tolak Laporan',
+                confirmButtonColor: "#f06548",
+                showLoaderOnConfirm: true,
+                preConfirm: (data) => {
+                    return fetch('', {
+                        method: "POST",
+                        body: JSON.stringify({ keterangan: data, id: taskid }),
+                        headers: { "Content-type": "application/json; charset=UTF-8" }
+                    })
+                        .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response.json();
+                    })
+                        .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //remove task
+                }
+            });
+        },
+        accept: function accept() {
+            confirm('Laporan diterima?');
+        }
+    },
+    mounted() {
+        axios
+            .get('https://ropeg.kemenag.go.id/trans/api/kloter')
+            .then((response) => {
+            document.getElementById('taskplaceholder').style.display = 'none';
+            this.posts = response.data;
+        })
+            .catch(function (error) {
+            if (error.response) {
+                console.log('a', error.response.data);
+                console.log('b', rror.response.status);
+                console.log('c', error.response.headers);
+            }
+            else if (error.request) {
+                //error here
+                var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'));
+                bsErrorcanvas.show();
+            }
+            else {
+                console.log('Error', error.message);
+            }
+        })
+            .finally(function () {
+            new List("pagination-list", {
+                valueNames: ["pagi-list"],
+                page: 10,
+                pagination: !0
+            });
+        });
+    },
+    components: { PageHeader, PageHeader, PageHeader }
+}
+</script>
+<template>
+<div class="page-content">
   <div class="container-fluid">
 
-    <!-- start page title -->
-    <div class="row">
-      <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-          <h4 class="mb-sm-0 font-size-18">Verifikasi Penkin</h4>
-
-          <div class="page-title-right">
-            <ol class="breadcrumb m-0">
-              <li class="breadcrumb-item"><a href="javascript:;">Penkin</a></li>
-              <li class="breadcrumb-item active">Verifikasi</li>
-            </ol>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
+    <PageHeader title="Penkin" pageTitle="Home"></PageHeader>
+    
     <div class="row">
       <div class="col-lg-12">
       <div class="d-flex flex-wrap gap-2">
@@ -114,9 +191,7 @@
         </div>
       </div>
     </div>
-
-
-  </div> <!-- container-fluid -->
+  </div>
 </div>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="detailCanvas" aria-labelledby="offcanvasRightLabel">
@@ -165,93 +240,3 @@
   </div>
 </div>
 </template>
-
-<script lang="ts">
-import axios from 'axios'
-bootstrap.Offcanvas.prototype._initializeFocusTrap = () => ({ activate: () => { }, deactivate: () => { } });
-export default {
-          data() {
-            return {
-              posts: []
-            }
-          },
-          methods: {
-            detail: function detail(id) {
-              event.stopPropagation()
-              var bsOffcanvas = new bootstrap.Offcanvas(document.getElementById('detailCanvas'))
-              bsOffcanvas.show()
-              document.getElementById('taskid').ariaValueNow = id
-            },
-            decline: function decline() {
-              let taskid = document.getElementById("taskid").ariaValueNow
-              console.log(taskid);
-              
-              Swal.fire({
-                text: 'Masukan informasi penolakan!',
-                input: 'text',
-                inputAttributes: {
-                  autocapitalize: 'off'
-                },
-                showCancelButton: true,
-                confirmButtonText: 'Tolak Laporan',
-                confirmButtonColor: "#f06548",
-                showLoaderOnConfirm: true,
-                preConfirm: (data) => {
-                  return fetch('', {
-                    method: "POST",
-                    body: JSON.stringify({ keterangan: data,id: taskid }),
-                    headers: {"Content-type": "application/json; charset=UTF-8"}})
-                    .then(response => {
-                      if (!response.ok) {
-                        throw new Error(response.statusText)
-                      }
-                      return response.json()
-                    })
-                    .catch(error => {
-                      Swal.showValidationMessage(
-                        `Request failed: ${error}`
-                      )
-                    })
-                  },
-                  allowOutsideClick: () => !Swal.isLoading()
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    //remove task
-                  }
-                });
-              },
-              accept: function accept(){
-                confirm('Laporan diterima?');
-              }
-          },
-          mounted() {
-          axios
-            .get('https://ropeg.kemenag.go.id/trans/api/kloter')
-            .then((response) => {
-              document.getElementById('taskplaceholder').style.display = 'none'
-              this.posts = response.data
-            })
-            .catch(function (error) {
-              if (error.response) {
-                console.log('a',error.response.data);
-                console.log('b',rror.response.status);
-                console.log('c',error.response.headers);
-              } else if (error.request) {
-                //error here
-                var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'))
-                bsErrorcanvas.show()
-              } else {
-                console.log('Error', error.message);
-              }
-            })
-            .finally(function () {
-              new List("pagination-list",{
-                valueNames: ["pagi-list"],
-                page: 10,
-                pagination: !0
-              })
-            })
-
-          }
-        }
-</script>

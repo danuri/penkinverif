@@ -1,0 +1,21 @@
+/*
+Template Name: Velzon - Admin & Dashboard Template
+Author: Themesbrand
+Website: https://themesbrand.com/
+Contact: support@themesbrand.com
+File: Custom Css File
+*/
+
+.main-content {
+    transition: all .1s ease-out;
+
+    @media (min-width: 768px) {
+        margin-left: 0;
+    }
+}
+[data-layout=vertical][data-sidebar-size=sm-hover] .footer {
+  left: 0;
+}
+.page-content {
+  padding-top: 1.5rem;
+}
