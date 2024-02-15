@@ -57,8 +57,66 @@ export default {
         }
     },
     mounted() {
+      /*
+      let data = JSON.stringify({
+        "tanggal_kerja": "2024-02-13",
+        "status_kerja": "STK-3"
+      });
+
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/getlist_pekerjaan_byparent',
+        headers: { 
+          'x-key': '!@4n)$*^nGnal123@#5npPKU', 
+          'x-access-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1bGFlaGEiLCJyb2xlX2lkIjozLCJub19wZW5kYWZ0YXJhbiI6IjQ1MDAwMTIiLCJqZW5pc190dWdhc19sYXRlc3QiOiJLT05TIiwiZnVsbG5hbWUiOiJLRVBBTEEiLCJlbWFpbCI6IkpVTEFFSEEiLCJrYW53aWxfcHJvdmluc2kiOiJqdWxhZWhhQG1haWwuY29tIiwia2Fud2lsX2tvdGEiOm51bGwsIm5hbWFfa2Fud2lsIjpudWxsLCJ0YWh1bl9oYWppX25hbWUiOm51bGwsImlhdCI6MTcwNzkwMTk5MiwiZXhwIjoxNzMxMjI5OTkyfQ.byE7Ubt7KYwEWD2FNiBtmY_Lz_YegUlJDFbhefaXLdE', 
+          'Content-Type': 'application/json'
+        },
+        data : data
+      };
+
+      axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch(function (error) {
+            if (error.response) {
+                console.log('a', error.response.data);
+                console.log('b', rror.response.status);
+                console.log('c', error.response.headers);
+            }
+            else if (error.request) {
+                //error here
+                var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'));
+                bsErrorcanvas.show();
+            }
+            else {
+                console.log('Error', error.message);
+            }
+        })
+            .finally(function () {
+            new List("pagination-list", {
+                valueNames: ["pagi-list"],
+                page: 10,
+                pagination: !0
+            });
+        });
+      */
+        let data = JSON.stringify({
+          "tanggal_kerja": "2024-02-13",
+          "status_kerja": "STK-3"
+        });
+
+        let config = {
+          headers: { 
+            'x-key': '!@4n)$*^nGnal123@#5npPKU', 
+            'x-access-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1bGFlaGEiLCJyb2xlX2lkIjozLCJub19wZW5kYWZ0YXJhbiI6IjQ1MDAwMTIiLCJqZW5pc190dWdhc19sYXRlc3QiOiJLT05TIiwiZnVsbG5hbWUiOiJLRVBBTEEiLCJlbWFpbCI6IkpVTEFFSEEiLCJrYW53aWxfcHJvdmluc2kiOiJqdWxhZWhhQG1haWwuY29tIiwia2Fud2lsX2tvdGEiOm51bGwsIm5hbWFfa2Fud2lsIjpudWxsLCJ0YWh1bl9oYWppX25hbWUiOm51bGwsImlhdCI6MTcwNzkwMTk5MiwiZXhwIjoxNzMxMjI5OTkyfQ.byE7Ubt7KYwEWD2FNiBtmY_Lz_YegUlJDFbhefaXLdE', 
+            'Content-Type': 'application/json'
+          }
+        };
+
         axios
-            .get('https://ropeg.kemenag.go.id/trans/api/kloter')
+            .post('https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/getlist_pekerjaan_byparent',data,config)
             .then((response) => {
             document.getElementById('taskplaceholder').style.display = 'none';
             this.posts = response.data;
@@ -85,6 +143,7 @@ export default {
                 pagination: !0
             });
         });
+        
     },
     components: { PageHeader, PageHeader, PageHeader }
 }
