@@ -3,126 +3,120 @@
 import PageHeader from '@/layouts/pageHeader.vue';
 import axios from 'axios'
 import Cookies from 'js-cookie';
-import { getCurrentInstance } from 'vue'
 bootstrap.Offcanvas.prototype._initializeFocusTrap = () => ({ activate: () => { }, deactivate: () => { } });
-
-const token = Cookies.get('token');
-
-let config = {
-  headers: {
-    'x-key': import.meta.env.VITE_XKEY,
-    'x-access-key': token,
-    'Content-Type': 'application/json'
-  }
-};
-
 export default {
     data() {
         return {
-            posts: [],
-            tasks: [],
+            posts: []
         };
     },
     methods: {
-        detail: function detail(postdata,index) {
-          console.log(postdata.kerja_id);
-          event.stopPropagation();
-
-          let kerja = postdata.kerja[index];
-
-          console.log(index);
-
-          var bsOffcanvas = new bootstrap.Modal(document.getElementById('appModal'));
-          bsOffcanvas.show();
-          document.getElementById('taskDetailTitle').innerHTML = postdata.deskripsi;
-          document.getElementById('taskDetailUraian').innerHTML = kerja.uraian_teks;
-          document.getElementById('taskid').ariaValueNow = kerja.kerja_id;
-          document.getElementById('imgthumb').src = "https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/get_image/"+kerja.evidence_filename;
-
+        detail: function detail(id) {
+            event.stopPropagation();
+            var bsOffcanvas = new bootstrap.Offcanvas(document.getElementById('detailCanvas'));
+            bsOffcanvas.show();
+            document.getElementById('taskid').ariaValueNow = id;
         },
         decline: function decline() {
-
-            if (confirm("Laporan ditolak?") == true) {
-            let taskid = parseInt(document.getElementById("taskid").ariaValueNow);
+            let taskid = document.getElementById("taskid").ariaValueNow;
             console.log(taskid);
-
-            let data = JSON.stringify({
-              "kerja": [taskid],
-              "is_approve": false,
+            Swal.fire({
+                text: 'Masukan informasi penolakan!',
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Tolak Laporan',
+                confirmButtonColor: "#f06548",
+                showLoaderOnConfirm: true,
+                preConfirm: (data) => {
+                    return fetch('', {
+                        method: "POST",
+                        body: JSON.stringify({ keterangan: data, id: taskid }),
+                        headers: { "Content-type": "application/json; charset=UTF-8" }
+                    })
+                        .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response.json();
+                    })
+                        .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //remove task
+                }
             });
-
-            axios
-                .post('https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/approve_kerja',data,config)
-                .then((response) => {
-                  console.log(response);
-            })
-                .catch(function (error) {
-                Toastify({
-                  text: error.response.data.message,
-                  className: "danger",
-                  duration: 1000
-                  }).showToast();
-            })
-                .finally(function () {
-                const appmodal = document.querySelector('#appModal');
-                const modal = bootstrap.Modal.getInstance(appmodal);
-                modal.hide();
-
-                location.reload();
-            });
-          }
         },
-        accept: function accept(id) {
-            if (confirm("Laporan diterima?") == true) {
-
-              let taskid = parseInt(document.getElementById("taskid").ariaValueNow);
-
-              let data = JSON.stringify({
-                "kerja": [taskid],
-                "is_approve": true,
-              });
-
-              axios
-                  .post('https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/approve_kerja',data,config)
-                  .then((response) => {
-                  Toastify({
-                    text: "Pekerjaan sukses diterima.",
-                    duration: 1000
-                    }).showToast();
-
-                  var bsOffcanvas = new bootstrap.Modal(document.getElementById('appModal'));
-                  bsOffcanvas.hide();
-              })
-                  .catch(function (error) {
-                  Toastify({
-                    text: error.response.data.message,
-                    className: "danger",
-                    duration: 1000
-                    }).showToast();
-              })
-                  .finally(function () {
-
-                  const appmodal = document.querySelector('#appModal');
-                  const modal = bootstrap.Modal.getInstance(appmodal);
-                  modal.hide();
-
-                  location.reload();
-              });
-            }
-        },
-        tasklist: function tasklist(pekerjaan){
-          event.stopPropagation();
-          var detailModal = new bootstrap.Modal(document.getElementById('modaldetail'));
-          detailModal.show();
-
-          this.tasks = pekerjaan
-        },
+        accept: function accept() {
+            confirm('Laporan diterima?');
+        }
     },
     mounted() {
+      /*
+      let data = JSON.stringify({
+        "tanggal_kerja": "2024-02-13",
+        "status_kerja": "STK-3"
+      });
+
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/getlist_pekerjaan_byparent',
+        headers: {
+          'x-key': '!@4n)$*^nGnal123@#5npPKU',
+          'x-access-key': token,
+          'Content-Type': 'application/json'
+        },
+        data : data
+      };
+
+      axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch(function (error) {
+            if (error.response) {
+                console.log('a', error.response.data);
+                console.log('b', rror.response.status);
+                console.log('c', error.response.headers);
+            }
+            else if (error.request) {
+                //error here
+                var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'));
+                bsErrorcanvas.show();
+            }
+            else {
+                console.log('Error', error.message);
+            }
+        })
+            .finally(function () {
+            new List("pagination-list", {
+                valueNames: ["pagi-list"],
+                page: 10,
+                pagination: !0
+            });
+        });
+      */
         let data = JSON.stringify({
-          "tanggal_kerja": "2024-02-27",
           "status_kerja": "STK-1"
         });
+
+        const token = Cookies.get('token');
+
+        let config = {
+          headers: {
+            'x-key': import.meta.env.VITE_XKEY,
+            'x-access-key': token,
+            'Content-Type': 'application/json'
+          }
+        };
+
 
         axios
             .post('https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/getlist_pekerjaan_byparent',data,config)
@@ -230,7 +224,7 @@ export default {
 
                       <div class="flex-grow-1 overflow-hidden">
                         <h5 class="fs-13 mb-1">
-                          <span @click="tasklist(post.pekerjaan)">{{ post.nama_lengkap }}</span>
+                          <router-link :to="`/tasks/${post.petugas}`">{{ post.nama_lengkap }}</router-link>
                         </h5>
                         <p class="born timestamp text-muted mb-0">Petugas ID: {{ post.petugas }}</p>
                       </div>
@@ -238,6 +232,7 @@ export default {
                       <div class="flex-shrink-0 ms-2">
                         <div>
                           <span class="badge rounded-pill border border-success text-success">{{ post.pekerjaan.length }}</span>
+                          <!-- <button type="button" class="btn btn-sm btn-light" @click="detail(post.id)"><i class="ri-mail-line align-bottom"></i> Detail</button> -->
                         </div>
                       </div>
                     </div>
@@ -265,56 +260,37 @@ export default {
   </div>
 </div>
 
-<div class="modal fade" id="modaldetail" tabindex="-1" aria-labelledby="modaldetailLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-md-down">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modaldetailLabel">Daftar Pekerjaan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="listtask">
-            <div>
-                <div class="list-group">
-                <div v-for="(row) in tasks">
-                  <div class="list-group-item list-group-item-action" v-for="(kerja,index) in row.kerja">
-                    <a @click="detail(row,index)">
-                      <div class="d-flex mb-2 align-items-center">
-                          <div class="flex-grow-1">
-                              <h5 class="list-title fs-15 mb-1">{{row.uraian}}</h5>
-                              <p class="list-text mb-0 fs-12">{{kerja.fase}}</p>
-                          </div>
-                      </div>
-                      <p class="list-text mb-0">Waktu Pekerjaan: {{kerja.waktu_mulai}}</p>
-                      </a>
-                  </div>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="detailCanvas" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Detail Penyelesaian Tugas</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body p-0 overflow-hidden">
+    <div data-simplebar style="height: calc(100vh - 112px);">
+      <div class="acitivity-timeline p-4">
+        <div class="acitivity-item d-flex">
+          <div class="flex-shrink-0">
+            <img src="https://d2mj1s7x3czrue.cloudfront.net/hrms/assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle acitivity-avatar">
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="mb-1">Oliver Phillips <span class="badge bg-primary-subtle text-primary align-middle">New</span></h6>
+            <p class="text-muted mb-2">We talked about a project on linkedin.</p>
+            <small class="mb-0 text-muted">Today</small>
+
+            <div class="row border border-dashed gx-2 p-2 mb-2">
+                <div class="col-12">
+                    <img src="https://d2mj1s7x3czrue.cloudfront.net/hrms/assets/images/small/img-2.jpg" alt="" class="img-fluid rounded">
                 </div>
-              </div>
             </div>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-
-<div id="appModal" class="modal fade" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="appModalLabel">Laporan Pekerjaan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
-            </div>
-            <div class="modal-body">
-                <h5 class="fs-15" id="taskDetailTitle"></h5>
-                <p class="text-muted" id="taskDetailUraian">...</p>
-                <img class="img-thumbnail" id="imgthumb" src="">
-            </div>
-            <div class="modal-footer bg-light p-3 justify-content-center">
-                <input type="hidden" name="id" id="taskid">
-                <button type="button" class="btn btn-danger" @click="decline(id)">Tolak</button>
-                <button type="button" class="btn btn-success " @click="accept(id)">Terima</button>
-            </div>
-
-        </div>
-    </div>
+  </div>
+  <div class="offcanvas-foorter border p-3 text-center">
+    <input type="hidden" name="id" id="taskid">
+    <a href="javascript:void(0);" class="btn btn-success" @click="accept(id)">Terima <i class="ri-checkbox-fill align-middle ms-1"></i></a> <a href="javascript:void(0);" class="btn btn-danger" @click="decline(id)">Kembalikan <i class="ri-close-circle-fill align-middle ms-1"></i></a>
+  </div>
 </div>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="errorCanvas" aria-labelledby="offcanvasRightLabel">
