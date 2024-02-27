@@ -2,7 +2,10 @@
 
 import PageHeader from '@/layouts/pageHeader.vue';
 import axios from 'axios'
+import { ref } from 'vue';
 bootstrap.Offcanvas.prototype._initializeFocusTrap = () => ({ activate: () => { }, deactivate: () => { } });
+
+
 export default {
     data() {
         return {
@@ -10,11 +13,16 @@ export default {
         };
     },
     methods: {
-        detail: function detail(id) {
+        detail: function detail(postdata) {
+            console.log(postdata.uraian);
             event.stopPropagation();
+
             var bsOffcanvas = new bootstrap.Offcanvas(document.getElementById('detailCanvas'));
             bsOffcanvas.show();
-            document.getElementById('taskid').ariaValueNow = id;
+            document.getElementById('taskDetailTitle').innerHTML = postdata.deskripsi;
+            document.getElementById('taskDetailJenis').innerHTML = postdata.jenis_pekerjaan;
+            document.getElementById('taskDetailUraian').innerHTML = postdata.uraian;
+            document.getElementById('taskid').ariaValueNow = postdata.id;
         },
         decline: function decline() {
             let taskid = document.getElementById("taskid").ariaValueNow;
@@ -57,66 +65,20 @@ export default {
         }
     },
     mounted() {
-      /*
-      let data = JSON.stringify({
-        "tanggal_kerja": "2024-02-13",
-        "status_kerja": "STK-3"
-      });
-
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/getlist_pekerjaan_byparent',
-        headers: { 
-          'x-key': '!@4n)$*^nGnal123@#5npPKU', 
-          'x-access-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1bGFlaGEiLCJyb2xlX2lkIjozLCJub19wZW5kYWZ0YXJhbiI6IjQ1MDAwMTIiLCJqZW5pc190dWdhc19sYXRlc3QiOiJLT05TIiwiZnVsbG5hbWUiOiJLRVBBTEEiLCJlbWFpbCI6IkpVTEFFSEEiLCJrYW53aWxfcHJvdmluc2kiOiJqdWxhZWhhQG1haWwuY29tIiwia2Fud2lsX2tvdGEiOm51bGwsIm5hbWFfa2Fud2lsIjpudWxsLCJ0YWh1bl9oYWppX25hbWUiOm51bGwsImlhdCI6MTcwNzkwMTk5MiwiZXhwIjoxNzMxMjI5OTkyfQ.byE7Ubt7KYwEWD2FNiBtmY_Lz_YegUlJDFbhefaXLdE', 
-          'Content-Type': 'application/json'
-        },
-        data : data
-      };
-
-      axios.request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-            if (error.response) {
-                console.log('a', error.response.data);
-                console.log('b', rror.response.status);
-                console.log('c', error.response.headers);
-            }
-            else if (error.request) {
-                //error here
-                var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'));
-                bsErrorcanvas.show();
-            }
-            else {
-                console.log('Error', error.message);
-            }
-        })
-            .finally(function () {
-            new List("pagination-list", {
-                valueNames: ["pagi-list"],
-                page: 10,
-                pagination: !0
-            });
-        });
-      */
         let data = JSON.stringify({
-          "tanggal_kerja": "2024-02-13",
-          "status_kerja": "STK-3"
+          "fase": "FASE-0"
         });
 
         let config = {
           headers: { 
             'x-key': '!@4n)$*^nGnal123@#5npPKU', 
-            'x-access-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1bGFlaGEiLCJyb2xlX2lkIjozLCJub19wZW5kYWZ0YXJhbiI6IjQ1MDAwMTIiLCJqZW5pc190dWdhc19sYXRlc3QiOiJLT05TIiwiZnVsbG5hbWUiOiJLRVBBTEEiLCJlbWFpbCI6IkpVTEFFSEEiLCJrYW53aWxfcHJvdmluc2kiOiJqdWxhZWhhQG1haWwuY29tIiwia2Fud2lsX2tvdGEiOm51bGwsIm5hbWFfa2Fud2lsIjpudWxsLCJ0YWh1bl9oYWppX25hbWUiOm51bGwsImlhdCI6MTcwNzkwMTk5MiwiZXhwIjoxNzMxMjI5OTkyfQ.byE7Ubt7KYwEWD2FNiBtmY_Lz_YegUlJDFbhefaXLdE', 
+            'x-access-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkphbWVzIiwicm9sZV9pZCI6Mywibm9fcGVuZGFmdGFyYW4iOiI0NTAwMDA2IiwiamVuaXNfdHVnYXNfbGF0ZXN0IjoiS09OUyIsImZ1bGxuYW1lIjoiUEVMQUtTQU5BIiwiZW1haWwiOiJqYW1lcyBib25vIiwia2Fud2lsX3Byb3ZpbnNpIjoiMDA3QGdtYWlsLmNvbSIsImthbndpbF9rb3RhIjpudWxsLCJuYW1hX2thbndpbCI6bnVsbCwidGFodW5faGFqaV9uYW1lIjpudWxsLCJpYXQiOjE3MDc4ODkxMzYsImV4cCI6MTczMTIxNzEzNn0.BP8mCekTMAkGs-UqcpPua_IATsk0dAsFo-bs39YMyn0', 
             'Content-Type': 'application/json'
           }
         };
 
         axios
-            .post('https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/getlist_pekerjaan_byparent',data,config)
+            .post('https://haji.kemenag.go.id/ptgsapi/dev/petugashaji/penkin/getlist_pekerjaan',data,config)
             .then((response) => {
             document.getElementById('taskplaceholder').style.display = 'none';
             this.posts = response.data.data;
@@ -168,7 +130,7 @@ export default {
       </div>
         <div class="card mt-3">
           <div class="card-body">
-            <p class="text-muted">Pastikan laporan yang disampaikan sudah sesuai</p>
+            <p class="text-muted">Data pekerjaan {{ $route.params.id }}</p>
 
             <div class="listjs-table" id="pagination-list">
               <div class="mb-2">
@@ -221,15 +183,14 @@ export default {
 
                       <div class="flex-grow-1 overflow-hidden">
                         <h5 class="fs-13 mb-1">
-                          <router-link :to="`/tasks/${post.petugas}`">{{ post.nama_lengkap }}</router-link>
+                            {{ post.deskripsi }}
                         </h5>
-                        <p class="born timestamp text-muted mb-0">Petugas ID: {{ post.petugas }}</p>
+                        <p class="born timestamp text-muted mb-0">{{ post.jenis_pekerjaan }}</p>
                       </div>
 
                       <div class="flex-shrink-0 ms-2">
                         <div>
-                          <span class="badge rounded-pill border border-success text-success">{{ post.pekerjaan.length }}</span>
-                          <!-- <button type="button" class="btn btn-sm btn-light" @click="detail(post.id)"><i class="ri-mail-line align-bottom"></i> Detail</button> -->
+                          <button type="button" class="btn btn-sm btn-light" @click="detail(post)"><i class="ri-mail-line align-bottom"></i> Detail</button>
                         </div>
                       </div>
                     </div>
@@ -270,8 +231,10 @@ export default {
             <img src="https://d2mj1s7x3czrue.cloudfront.net/hrms/assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle acitivity-avatar">
           </div>
           <div class="flex-grow-1 ms-3">
-            <h6 class="mb-1">Oliver Phillips <span class="badge bg-primary-subtle text-primary align-middle">New</span></h6>
-            <p class="text-muted mb-2">We talked about a project on linkedin.</p>
+            <h6 class="mb-1" id="taskDetailTitle">... <span class="badge bg-primary-subtle text-primary align-middle">New</span></h6>
+            <p class="text-muted mb-2">Jenis Pekerjaan: <span id="taskDetailJenis"></span></p>
+            
+            <p id="taskDetailUraian">inih</p>
             <small class="mb-0 text-muted">Today</small>
 
             <div class="row border border-dashed gx-2 p-2 mb-2">

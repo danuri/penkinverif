@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import axios from 'axios';
 import HomeView from '../views/HomeView.vue'
+import TasksView from '../views/TasksView.vue'
 import LoginView from '../views/LoginView.vue'
 
 const router = createRouter({
@@ -23,6 +24,10 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView
+    },
+    {
+      path: '/tasks/:id',
+      component: TasksView
     }
   ]
 })
