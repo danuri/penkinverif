@@ -107,7 +107,14 @@ export default {
                   const modal = bootstrap.Modal.getInstance(appmodal);
                   modal.hide();
 
-                  location.reload();
+                  if(response.data.hasil == null){
+                    Toastify({
+                    text: response.data.message,
+                    duration: 1000
+                    }).showToast();
+                  }else{
+                    location.reload();
+                  }
               });
             }
         },
