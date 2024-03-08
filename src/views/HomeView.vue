@@ -3,6 +3,7 @@
 import PageHeader from '@/layouts/pageHeader.vue';
 import axios from 'axios'
 import Cookies from 'js-cookie';
+import moment from 'moment'
 import { getCurrentInstance } from 'vue'
 bootstrap.Offcanvas.prototype._initializeFocusTrap = () => ({ activate: () => { }, deactivate: () => { } });
 
@@ -120,7 +121,7 @@ export default {
     },
     mounted() {
         let data = JSON.stringify({
-          "tanggal_kerja": "2024-02-27",
+          "tanggal_kerja": moment(new Date()).format('YYYY-MM-DD'),
           "status_kerja": "STK-1"
         });
 
@@ -130,16 +131,25 @@ export default {
             document.getElementById('taskplaceholder').style.display = 'none';
             this.posts = response.data.data;
 
-            console.log(response.data.data);
+            console.log(response.data);
+            if(response.data.message != 'Sukses'){
+              document.getElementById('errormessage').innerHTML = response.data.message;
+              var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'));
+              bsErrorcanvas.show();
+            }
         })
             .catch(function (error) {
             if (error.response) {
                 console.log('a', error.response.data);
-                console.log('b', rror.response.status);
+                console.log('b', error.response.status);
                 console.log('c', error.response.headers);
+                document.getElementById('errormessage').innerHTML = error.response.data;
+                var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'));
+                bsErrorcanvas.show();
             }
             else if (error.request) {
                 //error here
+                document.getElementById('errormessage').innerHTML = "Kami tidak dapat menampilkan data dikarenakan koneksi Anda terganggu. Periksa kembali koneksi Anda. Saat sudah kembali, silahkan klik refresh.";
                 var bsErrorcanvas = new bootstrap.Offcanvas(document.getElementById('errorCanvas'));
                 bsErrorcanvas.show();
             }
@@ -322,8 +332,8 @@ export default {
     <div data-simplebar style="height: calc(100vh - 112px);">
       <div class="text-center">
           <img src="https://img.themesbrand.com/velzon/images/auth-offline.gif" alt="" height="210">
-          <h3 class="mt-4 fw-semibold">Tidak dapat mengakses server!</h3>
-          <p class="text-muted mb-4 fs-14">Kami tidak dapat menampilkan data dikarenakan koneksi Anda terganggu. Periksa kembali koneksi Anda. Saat sudah kembali, silahkan klik refresh.</p>
+          <h3 class="mt-4 fw-semibold">Maaf, terjadi kesalahan!</h3>
+          <p class="text-muted mb-4 fs-14" id="errormessage"></p>
           <button class="btn btn-success btn-border" onclick="window.location.href=window.location.href"><i class="ri-refresh-line align-bottom"></i> Refresh</button>
       </div>
     </div>
