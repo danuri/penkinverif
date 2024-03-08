@@ -107,7 +107,7 @@ export default {
                   const modal = bootstrap.Modal.getInstance(appmodal);
                   modal.hide();
 
-                  if(response.data.hasil == null){
+                  if(response.data.data == null){
                     Toastify({
                     text: response.data.message,
                     duration: 1000
